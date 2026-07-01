@@ -13,23 +13,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        });
-        if (!user || !user.password) return null;
-        const isValid = await compare(
-          credentials.password as string,
-          user.password
-        );
-        if (!isValid) return null;
-        return {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          department: user.department || undefined,
-          canUploadDocs: user.canUploadDocs,
-        };
+        try {
+          const url = process.env.DATABASE_URL ? "SET" : "MISSING";
+          console.log("[AUTH] env:", url, "email:", credentials.email);
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          });
+          console.log("[AUTH] user:", user ? user.email : "NOT_FOUND");
+          if (!user || !user.password) return null;
+          const pw = credentials.password as string;
+          const isValid = await compare(pw, user.password);
+          console.log("[AUTH] valid:", isValid);
+          if (!isValid) return null;
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            department: user.department || undefined,
+            canUploadDocs: user.canUploadDocs,
+          };
+        } catch (e: any) {
+          console.error("[AUTH] ERROR:", e?.message, e?.stack?.split("\n")[1]);
+          return null;
+        }
       },
     }),
   ],
