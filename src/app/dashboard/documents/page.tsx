@@ -1,10 +1,10 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
 import { formatDate } from "@/lib/utils";
 import { FileText, FolderOpen } from "lucide-react";
-import { can } from "@/lib/roles";
 import UploadForm from "./UploadForm";
+import DocumentActions from "./DocumentActions";
 
 const categoryColors: Record<string, string> = {
   policy: "bg-blue-100 text-blue-800",
@@ -14,31 +14,43 @@ const categoryColors: Record<string, string> = {
   general: "bg-gray-100 text-gray-800",
 };
 
-export default async function DocumentsPage() {
-  const session = await auth();
-  if (!session) redirect("/login");
-  const role = session.user!.role;
+interface DocData {
+  id: string;
+  title: string;
+  description: string | null;
+  fileUrl: string;
+  category: string;
+  accessRoles: string;
+  createdAt: string;
+  uploadedBy: { name: string };
+}
 
-  const documents = await prisma.document.findMany({
-    orderBy: { createdAt: "desc" },
-    include: { uploadedBy: { select: { name: true } } },
-    where: {
-      OR: [
-        { accessRoles: "all" },
-        { accessRoles: { contains: role } },
-      ],
-    },
-  });
+export default function DocumentsPage() {
+  const [documents, setDocuments] = useState<DocData[]>([]);
+  const [role, setRole] = useState("");
+  const [canUpload, setCanUpload] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const canUpload = role === "admin" || session.user!.canUploadDocs;
-  const grouped = documents.reduce<Record<string, typeof documents>>(
-    (acc, doc) => {
-      if (!acc[doc.category]) acc[doc.category] = [];
-      acc[doc.category].push(doc);
-      return acc;
-    },
-    {}
-  );
+  const fetchData = useCallback(async () => {
+    const res = await fetch("/api/documents");
+    if (res.ok) {
+      const data = await res.json();
+      setDocuments(data.documents || []);
+      setRole(data.role || "");
+      setCanUpload(data.canUpload || false);
+    }
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  if (loading) return <div className="max-w-4xl mx-auto p-8 text-center text-gray-400">Loading...</div>;
+
+  const grouped = documents.reduce<Record<string, DocData[]>>((acc, doc) => {
+    if (!acc[doc.category]) acc[doc.category] = [];
+    acc[doc.category].push(doc);
+    return acc;
+  }, {});
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -84,7 +96,7 @@ export default async function DocumentsPage() {
                     <p className="text-sm text-gray-500 mt-1 truncate">{doc.description}</p>
                   )}
                   <p className="text-xs text-gray-400 mt-2">
-                    Uploaded by {doc.uploadedBy.name} • {formatDate(doc.createdAt)}
+                    Uploaded by {doc.uploadedBy.name} • {formatDate(new Date(doc.createdAt))}
                   </p>
                 </div>
                 <a
@@ -95,6 +107,9 @@ export default async function DocumentsPage() {
                 >
                   View
                 </a>
+                {role === "admin" && (
+                  <DocumentActions doc={doc} onUpdated={fetchData} onDeleted={fetchData} />
+                )}
               </div>
             ))}
           </div>

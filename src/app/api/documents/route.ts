@@ -2,6 +2,27 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const role = session.user.role;
+  const canUpload = role === "admin" || session.user.canUploadDocs;
+
+  const documents = await prisma.document.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { uploadedBy: { select: { name: true } } },
+    where: {
+      OR: [
+        { accessRoles: "all" },
+        { accessRoles: { contains: role } },
+      ],
+    },
+  });
+
+  return NextResponse.json({ documents, role, canUpload });
+}
+
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

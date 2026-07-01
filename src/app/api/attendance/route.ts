@@ -2,6 +2,26 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
+export async function GET() {
+  const session = await auth();
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const todayRecord = await prisma.attendance.findFirst({
+    where: { userId: session.user!.id, date: { gte: today } },
+  });
+
+  const history = await prisma.attendance.findMany({
+    where: { userId: session.user!.id },
+    orderBy: { date: "desc" },
+    take: 30,
+  });
+
+  return NextResponse.json({ todayRecord, history, role: session.user.role });
+}
+
 export async function POST() {
   const session = await auth();
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -10,10 +30,7 @@ export async function POST() {
   today.setHours(0, 0, 0, 0);
 
   const existing = await prisma.attendance.findFirst({
-    where: {
-      userId: session.user.id,
-      date: { gte: today },
-    },
+    where: { userId: session.user.id, date: { gte: today } },
   });
 
   if (existing) {
@@ -25,11 +42,7 @@ export async function POST() {
   const status = hour >= 9 ? "late" : "present";
 
   const record = await prisma.attendance.create({
-    data: {
-      userId: session.user.id,
-      checkIn: now,
-      status,
-    },
+    data: { userId: session.user.id, checkIn: now, status },
   });
 
   return NextResponse.json(record);
@@ -43,11 +56,7 @@ export async function PATCH() {
   today.setHours(0, 0, 0, 0);
 
   const existing = await prisma.attendance.findFirst({
-    where: {
-      userId: session.user.id,
-      date: { gte: today },
-      checkOut: null,
-    },
+    where: { userId: session.user.id, date: { gte: today }, checkOut: null },
   });
 
   if (!existing) {

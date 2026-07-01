@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { formatTime } from "@/lib/utils";
 
 interface CheckInOutProps {
@@ -13,21 +12,20 @@ interface CheckInOutProps {
   } | null;
 }
 
-export default function CheckInOut({ record }: CheckInOutProps) {
-  const router = useRouter();
+export default function CheckInOut({ record, onUpdated }: CheckInOutProps & { onUpdated?: () => void }) {
   const [loading, setLoading] = useState(false);
 
   async function handleCheckIn() {
     setLoading(true);
     await fetch("/api/attendance", { method: "POST" });
-    router.refresh();
+    onUpdated?.();
     setLoading(false);
   }
 
   async function handleCheckOut() {
     setLoading(true);
     await fetch("/api/attendance", { method: "PATCH" });
-    router.refresh();
+    onUpdated?.();
     setLoading(false);
   }
 

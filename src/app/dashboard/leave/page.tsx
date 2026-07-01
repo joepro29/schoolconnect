@@ -1,10 +1,10 @@
-import { auth } from "@/lib/auth";
-import { prisma } from "@/lib/db";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
 import { Calendar, CheckCircle, XCircle, Clock } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { can } from "@/lib/roles";
 import LeaveForm from "./LeaveForm";
+import LeaveActions from "./LeaveActions";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -18,27 +18,37 @@ const statusIcons: Record<string, any> = {
   rejected: XCircle,
 };
 
-export default async function LeavePage() {
-  const session = await auth();
-  if (!session) redirect("/login");
-  const role = session.user!.role;
+interface LeaveData {
+  id: string;
+  startDate: string;
+  endDate: string;
+  reason: string;
+  status: string;
+  user: { name: string; role: string };
+}
 
-  if (!can("leave_view", role)) {
-    redirect("/dashboard");
-  }
+export default function LeavePage() {
+  const [leaves, setLeaves] = useState<LeaveData[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const isAdmin = can("leave_approve", role);
-  const leaveRequests = await prisma.leaveRequest.findMany({
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: { select: { name: true, role: true } },
-    },
-    where: isAdmin ? {} : { userId: session.user!.id },
-  });
+  const fetchLeaves = useCallback(async () => {
+    const res = await fetch("/api/leave");
+    if (res.ok) {
+      const data = await res.json();
+      setLeaves(data.leaves || []);
+      setIsAdmin(data.isAdmin || false);
+    }
+    setLoading(false);
+  }, []);
 
-  const pendingCount = leaveRequests.filter((l) => l.status === "pending").length;
-  const approvedCount = leaveRequests.filter((l) => l.status === "approved").length;
-  const rejectedCount = leaveRequests.filter((l) => l.status === "rejected").length;
+  useEffect(() => { fetchLeaves(); }, [fetchLeaves]);
+
+  if (loading) return <div className="max-w-4xl mx-auto p-8 text-center text-gray-400">Loading...</div>;
+
+  const pendingCount = leaves.filter((l) => l.status === "pending").length;
+  const approvedCount = leaves.filter((l) => l.status === "approved").length;
+  const rejectedCount = leaves.filter((l) => l.status === "rejected").length;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -78,11 +88,11 @@ export default async function LeavePage() {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
         <div className="p-6">
           <h2 className="font-semibold text-gray-900 mb-4">Leave History</h2>
-          {leaveRequests.length === 0 ? (
+          {leaves.length === 0 ? (
             <p className="text-sm text-gray-400 text-center py-8">No leave requests yet</p>
           ) : (
             <div className="space-y-3">
-              {leaveRequests.map((leave) => {
+              {leaves.map((leave) => {
                 const StatusIcon = statusIcons[leave.status];
                 return (
                   <div
@@ -93,7 +103,7 @@ export default async function LeavePage() {
                       <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                       <div>
                         <p className="font-medium text-gray-900">
-                          {formatDate(leave.startDate)} - {formatDate(leave.endDate)}
+                          {formatDate(new Date(leave.startDate))} - {formatDate(new Date(leave.endDate))}
                         </p>
                         <p className="text-sm text-gray-500 mt-1">{leave.reason}</p>
                         {isAdmin && (
@@ -110,6 +120,14 @@ export default async function LeavePage() {
                         <StatusIcon className="w-3 h-3" />
                         {leave.status}
                       </span>
+                      {isAdmin && (
+                        <LeaveActions
+                          leaveId={leave.id}
+                          status={leave.status}
+                          onUpdated={fetchLeaves}
+                          onDeleted={fetchLeaves}
+                        />
+                      )}
                     </div>
                   </div>
                 );
