@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Unlink, Link2 } from "lucide-react";
+import { Unlink, Link2, CheckCircle } from "lucide-react";
 
 interface LinkParentFormProps {
   studentId: string;
@@ -15,11 +15,13 @@ export default function LinkParentForm({ studentId, studentName, linkedParents, 
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setSuccess("");
 
     const res = await fetch("/api/students/link", {
       method: "POST",
@@ -29,7 +31,7 @@ export default function LinkParentForm({ studentId, studentName, linkedParents, 
 
     if (res.ok) {
       setEmail("");
-      setError("");
+      setSuccess("Parent linked successfully!");
       onUpdated();
     } else {
       const data = await res.json();
@@ -40,13 +42,24 @@ export default function LinkParentForm({ studentId, studentName, linkedParents, 
 
   async function handleUnlink(parentId: string) {
     if (!confirm("Unlink this parent from the student?")) return;
+    setLoading(true);
     setError("");
+    setSuccess("");
+
     const res = await fetch("/api/students/link", {
       method: "DELETE",
       body: JSON.stringify({ studentId, parentId }),
       headers: { "Content-Type": "application/json" },
     });
-    if (res.ok) onUpdated();
+
+    if (res.ok) {
+      setSuccess("Parent unlinked successfully!");
+      onUpdated();
+    } else {
+      const data = await res.json();
+      setError(data.error || "Failed to unlink parent");
+    }
+    setLoading(false);
   }
 
   return (
@@ -79,7 +92,8 @@ export default function LinkParentForm({ studentId, studentName, linkedParents, 
                       </div>
                       <button
                         onClick={() => handleUnlink(p.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
+                        disabled={loading}
+                        className="text-red-500 hover:text-red-700 p-1 disabled:opacity-30"
                         title="Unlink parent"
                       >
                         <Unlink className="w-4 h-4" />
@@ -100,20 +114,27 @@ export default function LinkParentForm({ studentId, studentName, linkedParents, 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={loading}
                   placeholder="parent@school.edu"
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
               </div>
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>
+                <p className="text-sm text-red-600 bg-red-50 p-2 rounded flex items-center gap-1">{error}</p>
+              )}
+              {success && (
+                <p className="text-sm text-green-600 bg-green-50 p-2 rounded flex items-center gap-1">
+                  <CheckCircle className="w-4 h-4" /> {success}
+                </p>
               )}
 
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="px-4 py-2 text-gray-700 border rounded-lg hover:bg-gray-50"
+                  disabled={loading}
+                  className="px-4 py-2 text-gray-700 border rounded-lg hover:bg-gray-50 disabled:opacity-50"
                 >
                   Close
                 </button>
