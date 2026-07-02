@@ -19,6 +19,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Fee not found" }, { status: 404 });
   }
 
+  const isLinked = await prisma.studentParent.findFirst({
+    where: { parentId: session.user.id, studentId: fee.studentId },
+  });
+
+  if (!isLinked) {
+    return NextResponse.json({ error: "You are not linked to this student" }, { status: 403 });
+  }
+
   const paid = fee.payments.reduce((sum, p) => sum + p.amount, 0);
   const balance = fee.amount - paid;
 

@@ -59,7 +59,7 @@ export default function DocumentsPage() {
           <h1 className="text-2xl font-bold text-gray-900">Document Library</h1>
           <p className="text-gray-500 mt-1">Access policies, forms, and resources</p>
         </div>
-        {canUpload && <UploadForm />}
+        {canUpload && <UploadForm onCreated={fetchData} />}
       </div>
 
       {Object.keys(grouped).length === 0 && (

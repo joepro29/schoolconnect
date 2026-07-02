@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function LeaveForm() {
-  const router = useRouter();
+interface LeaveFormProps {
+  onCreated?: () => void;
+}
+
+export default function LeaveForm({ onCreated }: LeaveFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -25,7 +27,7 @@ export default function LeaveForm() {
 
     if (res.ok) {
       setShowForm(false);
-      router.refresh();
+      onCreated?.();
     }
     setLoading(false);
   }

@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function UploadForm() {
-  const router = useRouter();
+interface UploadFormProps {
+  onCreated?: () => void;
+}
+
+export default function UploadForm({ onCreated }: UploadFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -27,7 +29,7 @@ export default function UploadForm() {
 
     if (res.ok) {
       setShowForm(false);
-      router.refresh();
+      onCreated?.();
     }
     setLoading(false);
   }

@@ -89,7 +89,6 @@ export default function LoginPage() {
           <div className="space-y-1 text-xs text-gray-600">
             <p><strong>Admin:</strong> admin@school.edu / password123</p>
             <p><strong>Teacher:</strong> john.doe@school.edu / password123</p>
-            <p><strong>Student:</strong> alice.johnson@school.edu / password123</p>
             <p><strong>Parent:</strong> bob.parent@school.edu / password123</p>
           </div>
         </div>

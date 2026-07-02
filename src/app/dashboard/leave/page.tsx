@@ -59,7 +59,7 @@ export default function LeavePage() {
             {isAdmin ? "Manage all staff leave requests" : "Request and track your time off"}
           </p>
         </div>
-        <LeaveForm />
+        <LeaveForm onCreated={fetchLeaves} />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

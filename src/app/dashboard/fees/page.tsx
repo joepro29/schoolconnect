@@ -65,7 +65,7 @@ export default function FeesPage() {
   if (loading) return <div className="max-w-4xl mx-auto p-8 text-center text-gray-400">Loading...</div>;
 
   if (role === "parent") {
-    return <ParentView fees={fees} />;
+    return <ParentView fees={fees} onRefresh={fetchData} />;
   }
 
   return <AdminView fees={fees} students={students} onRefresh={fetchData} />;
@@ -175,7 +175,7 @@ function AdminView({ fees, students, onRefresh }: { fees: FeeRecord[]; students:
   );
 }
 
-function ParentView({ fees }: { fees: FeeRecord[] }) {
+function ParentView({ fees, onRefresh }: { fees: FeeRecord[]; onRefresh: () => void }) {
   let grandTotal = 0;
 
   const grouped: Record<string, FeeRecord[]> = {};
@@ -245,7 +245,7 @@ function ParentView({ fees }: { fees: FeeRecord[] }) {
                         </td>
                         <td className="p-4 text-right">
                           {balance > 0 ? (
-                            <PayForm feeId={fee.id} studentName={studentName} description={fee.description} maxAmount={balance} />
+                            <PayForm feeId={fee.id} studentName={studentName} description={fee.description} maxAmount={balance} onUpdated={onRefresh} />
                           ) : (
                             <span className="text-xs text-green-600 font-medium">Paid</span>
                           )}

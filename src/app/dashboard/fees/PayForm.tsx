@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface PayFormProps {
   feeId: string;
   studentName: string;
   description: string;
   maxAmount: number;
+  onUpdated?: () => void;
 }
 
-export default function PayForm({ feeId, studentName, description, maxAmount }: PayFormProps) {
-  const router = useRouter();
+export default function PayForm({ feeId, studentName, description, maxAmount, onUpdated }: PayFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +32,7 @@ export default function PayForm({ feeId, studentName, description, maxAmount }: 
 
     if (res.ok) {
       setShowForm(false);
-      router.refresh();
+      onUpdated?.();
     }
     setLoading(false);
   }
