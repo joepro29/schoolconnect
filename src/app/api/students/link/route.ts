@@ -46,16 +46,17 @@ export async function DELETE(req: Request) {
   }
 
   const { studentId, parentId } = await req.json();
+  if (!parentId || !studentId) {
+    return NextResponse.json({ error: "Missing parentId or studentId" }, { status: 400 });
+  }
 
-  const link = await prisma.studentParent.findFirst({
+  const deleted = await prisma.studentParent.deleteMany({
     where: { parentId, studentId },
   });
 
-  if (!link) {
+  if (deleted.count === 0) {
     return NextResponse.json({ error: "Link not found" }, { status: 404 });
   }
-
-  await prisma.studentParent.delete({ where: { id: link.id } });
 
   return NextResponse.json({ success: true });
 }
