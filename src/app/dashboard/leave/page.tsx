@@ -52,7 +52,7 @@ export default function LeavePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Leave Management</h1>
           <p className="text-gray-500 mt-1">
@@ -62,7 +62,7 @@ export default function LeavePage() {
         <LeaveForm />
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "Pending", value: pendingCount, icon: Clock, color: "bg-yellow-500" },
           { label: "Approved", value: approvedCount, icon: CheckCircle, color: "bg-green-500" },
@@ -97,7 +97,7 @@ export default function LeavePage() {
                 return (
                   <div
                     key={leave.id}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-gray-50 rounded-lg gap-3"
                   >
                     <div className="flex items-start gap-3">
                       <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />

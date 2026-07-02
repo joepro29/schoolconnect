@@ -121,7 +121,7 @@ export default function ResultActions({
                 <label className="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
                 <input name="subject" defaultValue={result.subject} required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Score (%) *</label>
                   <input name="score" type="number" min="0" max="100" value={score} onChange={(e) => handleScoreChange(e.target.value)} required className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />

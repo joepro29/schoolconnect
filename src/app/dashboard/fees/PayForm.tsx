@@ -48,7 +48,7 @@ export default function PayForm({ feeId, studentName, description, maxAmount }: 
       </button>
 
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
             <h2 className="text-lg font-semibold mb-1">Make a Payment</h2>
             <p className="text-sm text-gray-500 mb-4">

@@ -94,7 +94,7 @@ export default function ScheduleForm({ initial, onClose }: ScheduleFormProps) {
     return (
       <form onSubmit={handleSubmit} className="space-y-3">
         <input type="hidden" name="dayOfWeek" value={initial.dayOfWeek} />
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Day</label>
             <select
@@ -127,7 +127,7 @@ export default function ScheduleForm({ initial, onClose }: ScheduleFormProps) {
             className="w-full px-2 py-1.5 text-sm border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">Teacher</label>
             <select
@@ -182,11 +182,11 @@ export default function ScheduleForm({ initial, onClose }: ScheduleFormProps) {
   }
 
   const formContent = (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl p-6 w-full max-w-md mx-4">
         <h2 className="text-lg font-semibold mb-4">Add Class</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Day</label>
               <select
@@ -217,7 +217,7 @@ export default function ScheduleForm({ initial, onClose }: ScheduleFormProps) {
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Teacher</label>
               <select

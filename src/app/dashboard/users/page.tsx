@@ -24,7 +24,7 @@ export default async function UsersPage() {
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">User Accounts</h1>
           <p className="text-gray-500 mt-1">Manage teacher and parent logins</p>
@@ -38,6 +38,7 @@ export default async function UsersPage() {
           Teachers ({teachers.length})
         </h2>
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-gray-500 border-b border-gray-100 bg-gray-50">
@@ -69,6 +70,7 @@ export default async function UsersPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
 
@@ -78,6 +80,7 @@ export default async function UsersPage() {
           Parents ({parents.length})
         </h2>
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-gray-500 border-b border-gray-100 bg-gray-50">
@@ -105,6 +108,7 @@ export default async function UsersPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

@@ -87,7 +87,7 @@ function AdminView({ results, students, onRefresh }: { results: ResultRecord[]; 
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Results Management</h1>
           <p className="text-gray-500 mt-1">Manage academic results for all students</p>
