@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/cn";
 import { signOut } from "next-auth/react";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   LayoutDashboard,
   Calendar,
@@ -41,9 +41,11 @@ const iconMap: Record<string, React.ElementType> = {
 export default function Sidebar({
   open,
   onClose,
+  onOpen,
 }: {
   open: boolean;
   onClose: () => void;
+  onOpen: () => void;
 }) {
   const pathname = usePathname();
   const { data: session } = useSession();
@@ -55,6 +57,15 @@ export default function Sidebar({
 
   return (
     <>
+      {!open && (
+        <button
+          onClick={onOpen}
+          className="fixed top-1/2 -translate-y-1/2 left-0 z-50 bg-indigo-600 text-white p-1.5 rounded-r-lg shadow-lg lg:hidden hover:bg-indigo-700 transition-colors"
+        >
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      )}
+
       {open && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -79,7 +90,7 @@ export default function Sidebar({
             onClick={onClose}
             className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 lg:hidden"
           >
-            <X className="w-5 h-5" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         </div>
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
