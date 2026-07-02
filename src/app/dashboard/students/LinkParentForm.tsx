@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Unlink, Link2 } from "lucide-react";
 
 interface LinkParentFormProps {
   studentId: string;
   studentName: string;
   linkedParents: { id: string; name: string; email: string }[];
+  onUpdated: () => void;
 }
 
-export default function LinkParentForm({ studentId, studentName, linkedParents }: LinkParentFormProps) {
-  const router = useRouter();
+export default function LinkParentForm({ studentId, studentName, linkedParents, onUpdated }: LinkParentFormProps) {
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -31,7 +30,7 @@ export default function LinkParentForm({ studentId, studentName, linkedParents }
     if (res.ok) {
       setEmail("");
       setError("");
-      router.refresh();
+      onUpdated();
     } else {
       const data = await res.json();
       setError(data.error || "Failed to link parent");
@@ -47,7 +46,7 @@ export default function LinkParentForm({ studentId, studentName, linkedParents }
       body: JSON.stringify({ studentId, parentId }),
       headers: { "Content-Type": "application/json" },
     });
-    if (res.ok) router.refresh();
+    if (res.ok) onUpdated();
   }
 
   return (

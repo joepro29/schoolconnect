@@ -100,6 +100,7 @@ export default function StudentsPage() {
                         studentId={student.id}
                         studentName={student.name}
                         linkedParents={student.parents.map(sp => ({ id: sp.parent.id, name: sp.parent.name, email: sp.parent.email }))}
+                        onUpdated={fetchStudents}
                       />
                       <StudentActions student={student} onUpdated={fetchStudents} onDeleted={fetchStudents} />
                     </div>
